@@ -45,6 +45,9 @@ git push -u origin main
 
 ### Шаг 2: Деплой на Vercel
 
+> **В продакшене** используйте `npx prisma migrate deploy` вместо `bun run db:push`.
+
+
 1. Перейдите на [vercel.com](https://vercel.com)
 2. Нажмите **"Sign Up"** → выберите **"Continue with GitHub"**
 3. После входа нажмите **"Add New..."** → **"Project"**
