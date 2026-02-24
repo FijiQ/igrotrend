@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import { sign } from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'igrotrend-secret-key-2026';
+import { generateAccessToken, createRefreshToken, setRefreshCookie } from '@/lib/auth';
+import { isRateLimited } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
+    // basic rate limiting per IP
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('host') || 'unknown';
+    if (isRateLimited(`login:${ip}`, 5, 60 * 1000)) {
+      return NextResponse.json({ error: 'Too many attempts, try again later' }, { status: 429 });
+    }
+
     const { email, password } = await request.json();
 
     if (!email || !password) {
@@ -43,13 +48,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = sign(
-      { userId: user.id, email: user.email },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    const token = generateAccessToken({ userId: user.id, email: user.email });
 
-    return NextResponse.json({
+    // create a refresh token, store in DB, and send via httpOnly cookie
+    const refreshToken = await createRefreshToken(user.id);
+    const res = NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
@@ -65,6 +68,8 @@ export async function POST(request: NextRequest) {
       },
       token,
     });
+    setRefreshCookie(res, refreshToken);
+    return res;
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(

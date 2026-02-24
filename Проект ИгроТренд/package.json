@@ -83,7 +83,8 @@
     "vaul": "^1.1.2",
     "z-ai-web-dev-sdk": "^0.0.16",
     "zod": "^4.0.2",
-    "zustand": "^5.0.6"
+    "zustand": "^5.0.6",
+    "nodemailer": "^6.9.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

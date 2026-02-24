@@ -29,6 +29,7 @@
 - Настроить Prisma migrations вместо `db:push`. ✅ (первичная миграция создана и закоммичена)
   - `prisma migrate dev` для разработки.
   - `prisma migrate deploy` для production.
+- Добавить таблицу для refresh-токенов (сделано).
 - (Документация обновлена, README/DEPLOY.md содержат инструкции.)
 - Добавить инструкции в `package.json` скрипты (есть `db:migrate`/`db:deploy`).
 - Выбрать production БД (PostgreSQL/MySQL/PlanetScale).
@@ -43,9 +44,9 @@
 - Настроить ESLint с строгими правилами.
 
 ### Аутентификация
-- Настроить реальную отправку email (SMTP).
-- Добавить rate limiting для API эндпоинтов.
-- Реализовать refresh tokens.
+- Настроить реальную отправку email (SMTP). ✅ реализация через nodemailer и `src/lib/email.ts`.
+- Добавить rate limiting для API эндпоинтов. ✅ простая in-memory функция в `src/lib/rate-limit.ts` (примеры в login/register/verify).
+- Реализовать refresh tokens. ✅ добавлен `RefreshToken` модель, endpoints login/refresh/logout + helper `src/lib/auth.ts`.
 - Добавить 2FA (опционально).
 - Настроить CORS политики.
 

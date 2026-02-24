@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { randomInt } from 'crypto';
+import { isRateLimited } from '@/lib/rate-limit';
+import { sendEmail } from '@/lib/email';
 
 function generateVerificationCode(): string {
   return String(randomInt(100000, 999999));
@@ -9,6 +11,16 @@ function generateVerificationCode(): string {
 
 export async function POST(request: NextRequest) {
   try {
+    const ip =
+      request.headers.get('x-forwarded-for') || request.headers.get('host') ||
+      'unknown';
+    if (isRateLimited(`register:${ip}`, 3, 60 * 60 * 1000)) {
+      return NextResponse.json(
+        { error: 'Too many registration attempts, try again later' },
+        { status: 429 }
+      );
+    }
+
     const { email, password, username, displayName } = await request.json();
 
     // Validation
@@ -87,13 +99,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // In a real app, send email here
-    console.log(`Verification code for ${email}: ${code}`);
+    // Send email if SMTP configured
+    const subject = 'Your ИгроТренд verification code';
+    const text = `Your verification code is: ${code}`;
+    await sendEmail(email, subject, text);
 
     return NextResponse.json({
       message: 'Registration successful. Please verify your email.',
       email,
-      // For demo purposes, return the code (remove in production)
       ...(process.env.NODE_ENV === 'development' && { code }),
     });
   } catch (error) {

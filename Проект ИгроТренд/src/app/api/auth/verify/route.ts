@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { sign } from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'igrotrend-secret-key-2026';
+import { generateAccessToken, createRefreshToken, setRefreshCookie } from '@/lib/auth';
+import { isRateLimited } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
+    const ip =
+      request.headers.get('x-forwarded-for') || request.headers.get('host') ||
+      'unknown';
+    if (isRateLimited(`verify:${ip}`, 10, 60 * 60 * 1000)) {
+      return NextResponse.json(
+        { error: 'Too many attempts, try again later' },
+        { status: 429 }
+      );
+    }
+
     const { email, code } = await request.json();
 
     if (!email || !code) {
@@ -47,14 +56,11 @@ export async function POST(request: NextRequest) {
       where: { id: verificationCode.id },
     });
 
-    // Generate token
-    const token = sign(
-      { userId: user.id, email: user.email },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Generate tokens
+    const accessToken = generateAccessToken({ userId: user.id, email: user.email });
+    const refreshToken = await createRefreshToken(user.id);
 
-    return NextResponse.json({
+    const res = NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
@@ -68,8 +74,10 @@ export async function POST(request: NextRequest) {
         emailStatus: user.emailStatus,
         role: user.role,
       },
-      token,
+      token: accessToken,
     });
+    setRefreshCookie(res, refreshToken);
+    return res;
   } catch (error) {
     console.error('Verification error:', error);
     return NextResponse.json(
