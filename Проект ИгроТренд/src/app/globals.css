@@ -1,0 +1,390 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Design Tokens - Neon Gaming Theme */
+:root {
+  /* Background & Surface */
+  --background: 0 0% 3%;
+  --background-secondary: 270 50% 6%;
+  --surface: 270 40% 8%;
+  --surface-subtle: 270 30% 12%;
+  --surface-hover: 270 40% 15%;
+  
+  /* Text */
+  --foreground: 0 0% 98%;
+  --foreground-secondary: 270 20% 75%;
+  --foreground-muted: 270 15% 50%;
+  
+  /* Borders */
+  --border: 270 30% 18%;
+  --border-subtle: 270 20% 12%;
+  --border-glow: 280 100% 60%;
+  
+  /* Primary - Neon Purple */
+  --primary: 280 100% 60%;
+  --primary-hover: 280 100% 65%;
+  --primary-active: 280 100% 55%;
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: 280 100% 60%;
+  
+  /* Secondary - Neon Cyan */
+  --secondary: 180 100% 50%;
+  --secondary-hover: 180 100% 55%;
+  --secondary-foreground: 0 0% 5%;
+  
+  /* Accent - Neon Pink */
+  --accent: 320 100% 60%;
+  --accent-foreground: 0 0% 100%;
+  
+  /* Semantic Colors */
+  --success: 150 100% 45%;
+  --warning: 45 100% 55%;
+  --danger: 0 100% 60%;
+  --info: 200 100% 55%;
+  
+  /* Radius */
+  --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  
+  /* Shadows with glow effects */
+  --shadow-sm: 0 1px 2px 0 hsl(270 30% 5% / 0.5);
+  --shadow-md: 0 4px 6px -1px hsl(270 30% 5% / 0.5), 0 2px 4px -2px hsl(270 30% 5% / 0.5);
+  --shadow-lg: 0 10px 15px -3px hsl(270 30% 5% / 0.5), 0 4px 6px -4px hsl(270 30% 5% / 0.5);
+  --shadow-glow-primary: 0 0 20px hsl(280 100% 60% / 0.3), 0 0 40px hsl(280 100% 60% / 0.1);
+  --shadow-glow-secondary: 0 0 20px hsl(180 100% 50% / 0.3), 0 0 40px hsl(180 100% 50% / 0.1);
+  --shadow-glow-accent: 0 0 20px hsl(320 100% 60% / 0.3), 0 0 40px hsl(320 100% 60% / 0.1);
+}
+
+/* Light mode (optional) */
+.light {
+  --background: 0 0% 98%;
+  --background-secondary: 270 30% 96%;
+  --surface: 0 0% 100%;
+  --surface-subtle: 270 20% 98%;
+  --surface-hover: 270 30% 94%;
+  
+  --foreground: 270 30% 10%;
+  --foreground-secondary: 270 20% 40%;
+  --foreground-muted: 270 15% 60%;
+  
+  --border: 270 20% 88%;
+  --border-subtle: 270 15% 92%;
+  
+  --shadow-sm: 0 1px 2px 0 hsl(270 20% 50% / 0.1);
+  --shadow-md: 0 4px 6px -1px hsl(270 20% 50% / 0.1);
+  --shadow-lg: 0 10px 15px -3px hsl(270 20% 50% / 0.15);
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-background-secondary: hsl(var(--background-secondary));
+  --color-surface: hsl(var(--surface));
+  --color-surface-subtle: hsl(var(--surface-subtle));
+  --color-surface-hover: hsl(var(--surface-hover));
+  
+  --color-foreground: hsl(var(--foreground));
+  --color-foreground-secondary: hsl(var(--foreground-secondary));
+  --color-foreground-muted: hsl(var(--foreground-muted));
+  
+  --color-border: hsl(var(--border));
+  --color-border-subtle: hsl(var(--border-subtle));
+  --color-border-glow: hsl(var(--border-glow));
+  
+  --color-primary: hsl(var(--primary));
+  --color-primary-hover: hsl(var(--primary-hover));
+  --color-primary-active: hsl(var(--primary-active));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-hover: hsl(var(--secondary-hover));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+  --color-danger: hsl(var(--danger));
+  --color-info: hsl(var(--info));
+  
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
+/* Base styles */
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--surface-subtle));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5);
+}
+
+/* Neon glow animations */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px hsl(var(--primary) / 0.5),
+                0 0 10px hsl(var(--primary) / 0.3),
+                0 0 20px hsl(var(--primary) / 0.1);
+  }
+  50% {
+    box-shadow: 0 0 10px hsl(var(--primary) / 0.6),
+                0 0 20px hsl(var(--primary) / 0.4),
+                0 0 40px hsl(var(--primary) / 0.2);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes card-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes swipe-left {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-150%) rotate(-20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipe-right {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(150%) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipe-up {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-150%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Utility classes */
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+.animate-card-enter {
+  animation: card-enter 0.4s ease-out forwards;
+}
+
+.animate-swipe-left {
+  animation: swipe-left 0.4s ease-out forwards;
+}
+
+.animate-swipe-right {
+  animation: swipe-right 0.4s ease-out forwards;
+}
+
+.animate-swipe-up {
+  animation: swipe-up 0.4s ease-out forwards;
+}
+
+/* Glass effect */
+.glass {
+  background: hsl(var(--surface) / 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid hsl(var(--border) / 0.5);
+}
+
+/* Neon border glow */
+.neon-border {
+  border: 1px solid hsl(var(--primary) / 0.5);
+  box-shadow: inset 0 0 10px hsl(var(--primary) / 0.1);
+}
+
+.neon-border:hover {
+  border-color: hsl(var(--primary));
+  box-shadow: inset 0 0 15px hsl(var(--primary) / 0.15),
+              0 0 10px hsl(var(--primary) / 0.2);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)), hsl(var(--accent)));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Button hover effects */
+.btn-glow:hover {
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.4),
+              0 0 40px hsl(var(--primary) / 0.2);
+}
+
+/* Card styles */
+.card-neon {
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+}
+
+.card-neon:hover {
+  border-color: hsl(var(--primary) / 0.5);
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.1),
+              0 10px 40px hsl(var(--background) / 0.8);
+  transform: translateY(-2px);
+}
+
+/* Input focus glow */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2),
+              0 0 10px hsl(var(--primary) / 0.1);
+}
+
+/* Level badge colors */
+.level-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.level-badge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, hsl(var(--primary) / 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.level-badge:hover::before {
+  opacity: 1;
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--surface-subtle)) 25%,
+    hsl(var(--surface-hover)) 50%,
+    hsl(var(--surface-subtle)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Toast customization */
+.toast-success {
+  background: hsl(var(--success)) !important;
+  color: white !important;
+}
+
+.toast-error {
+  background: hsl(var(--danger)) !important;
+  color: white !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  :root {
+    --radius: 0.5rem;
+  }
+}
+
+/* Hide scrollbar for certain elements */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

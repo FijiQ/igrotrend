@@ -1,0 +1,316 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Поддерживаемые языки
+enum Language {
+  RU
+  KZ
+  EN
+  BY
+}
+
+// Статус команды
+enum TeamStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Статус email подтверждения
+enum EmailStatus {
+  PENDING
+  VERIFIED
+}
+
+// Роль пользователя
+enum UserRole {
+  USER
+  ADMIN
+  DEVELOPER
+}
+
+// Пользователи
+model User {
+  id            String      @id @default(cuid())
+  email         String      @unique
+  password      String
+  username      String      @unique
+  displayName   String?
+  avatar        String?
+  bio           String?
+  language      Language    @default(RU)
+  emailStatus   EmailStatus @default(PENDING)
+  verifyToken   String?
+  role          UserRole    @default(USER)
+  
+  // Уровень и опыт
+  level         Int         @default(1)
+  exp           Int         @default(0)
+  coins         Int         @default(0)
+  
+  // Для дейтинга
+  birthDate     DateTime?
+  gender        String?
+  city          String?
+  country       String?
+  interests     String?     // JSON array of interests
+  lookingFor    String?     // what they're looking for
+  datingActive  Boolean     @default(false)
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Relations
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  commentLikes  CommentLike[]
+  subscriptions Subscription[]
+  subscribers   Subscription[]  @relation("UserSubscribers")
+  clubs         ClubMember[]
+  createdClubs  Club[]
+  teamMembers   TeamMember[]
+  createdTeams  Team[]
+  datingSwipes  DatingSwipe[]
+  receivedSwipes DatingSwipe[]  @relation("ReceivedSwipes")
+  matches       DatingMatch[]
+  matchedWith   DatingMatch[]   @relation("MatchedWith")
+  notifications Notification[]
+  reposts       Repost[]
+}
+
+// Посты/Статьи
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  language    Language @default(RU)
+  image       String?
+  authorId    String
+  published   Boolean  @default(true)
+  viewCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  author      User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  likes       Like[]
+  reposts     Repost[]
+  tags        PostTag[]
+}
+
+// Комментарии
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  postId    String
+  parentId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+  likes     CommentLike[]
+}
+
+// Лайки постов
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, postId])
+}
+
+// Лайки комментариев
+model CommentLike {
+  id        String   @id @default(cuid())
+  userId    String
+  commentId String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, commentId])
+}
+
+// Репосты
+model Repost {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  comment   String?
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, postId])
+}
+
+// Подписки на пользователей
+model Subscription {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  
+  follower    User     @relation("UserSubscribers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation(fields: [followingId], references: [id], onDelete: Cascade)
+  
+  @@unique([followerId, followingId])
+}
+
+// Теги
+model Tag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  posts     PostTag[]
+}
+
+// Связь постов и тегов
+model PostTag {
+  postId String
+  tagId  String
+  
+  post   Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([postId, tagId])
+}
+
+// Клубы единомышленников
+model Club {
+  id          String      @id @default(cuid())
+  name        String
+  description String
+  image       String?
+  language    Language    @default(RU)
+  creatorId   String
+  isPrivate   Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  creator     User        @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  members     ClubMember[]
+}
+
+// Участники клубов
+model ClubMember {
+  id      String   @id @default(cuid())
+  clubId  String
+  userId  String
+  role    String   @default("member") // owner, admin, member
+  joinedAt DateTime @default(now())
+  
+  club    Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([clubId, userId])
+}
+
+// Киберспортивные команды
+model Team {
+  id          String     @id @default(cuid())
+  name        String
+  tag         String     // короткий тег команды
+  description String?
+  logo        String?
+  game        String     // игра
+  language    Language   @default(RU)
+  status      TeamStatus @default(PENDING)
+  creatorId   String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  creator     User       @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+}
+
+// Участники команд
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      String   @default("player") // captain, player, coach, manager
+  nickname  String?  // игровой никнейм
+  bio       String?  // биография игрока
+  position  String?  // позиция в игре
+  joinedAt  DateTime @default(now())
+  
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([teamId, userId])
+}
+
+// Свайпы для дейтинга
+model DatingSwipe {
+  id        String   @id @default(cuid())
+  fromId    String
+  toId      String
+  direction  String  // left (dislike), right (like), up (super like - for coins)
+  createdAt DateTime @default(now())
+  
+  from      User     @relation(fields: [fromId], references: [id], onDelete: Cascade)
+  to        User     @relation("ReceivedSwipes", fields: [toId], references: [id], onDelete: Cascade)
+  
+  @@unique([fromId, toId])
+}
+
+// Матчи при взаимных лайках
+model DatingMatch {
+  id        String   @id @default(cuid())
+  user1Id   String
+  user2Id   String
+  createdAt DateTime @default(now())
+  
+  user1     User     @relation(fields: [user1Id], references: [id], onDelete: Cascade)
+  user2     User     @relation("MatchedWith", fields: [user2Id], references: [id], onDelete: Cascade)
+  
+  @@unique([user1Id, user2Id])
+}
+
+// Уведомления
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // like, comment, follow, match, team_approved, etc.
+  title     String
+  content   String?
+  data      String?  // JSON for additional data
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Коды подтверждения email
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  type      String   // register, reset_password
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
