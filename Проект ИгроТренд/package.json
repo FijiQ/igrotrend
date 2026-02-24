@@ -84,7 +84,9 @@
     "z-ai-web-dev-sdk": "^0.0.16",
     "zod": "^4.0.2",
     "zustand": "^5.0.6",
-    "nodemailer": "^6.9.3"
+    "nodemailer": "^7.0.13",
+    "otplib": "^12.0.1",
+    "qrcode": "^1.5.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
