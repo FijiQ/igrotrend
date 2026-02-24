@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Too many attempts, try again later' }, { status: 429 });
     }
 
-    const { email, password } = await request.json();
+    const { email, password, code } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -24,6 +24,21 @@ export async function POST(request: NextRequest) {
     const user = await db.user.findUnique({
       where: { email },
     });
+
+    if (user?.yandexKeyEnabled) {
+      if (!code) {
+        return NextResponse.json({
+          error: 'Yandex Key code required',
+          requiresYandexKey: true,
+        }, { status: 403 });
+      }
+      // verify TOTP
+      const { authenticator } = await import('otplib');
+      const valid = authenticator.check(code, user.yandexKeySecret || '');
+      if (!valid) {
+        return NextResponse.json({ error: 'Invalid Yandex Key code' }, { status: 401 });
+      }
+    }
 
     if (!user) {
       return NextResponse.json(

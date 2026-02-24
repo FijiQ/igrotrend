@@ -56,6 +56,10 @@ model User {
   level         Int         @default(1)
   exp           Int         @default(0)
   coins         Int         @default(0)
+
+  // Yandex Key (TOTP) authentication
+  yandexKeyEnabled Boolean @default(false)
+  yandexKeySecret  String?
   
   // Для дейтинга
   birthDate     DateTime?
