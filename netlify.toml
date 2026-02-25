@@ -1,6 +1,6 @@
 [build]
   base = "Проект ИгроТренд"
-  command = "bun install && bun run build"
+  command = "npm install && npm run build"
   publish = ".next"
 
 [[plugins]]
@@ -8,19 +8,3 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  NPM_FLAGS = "--legacy-peer-deps"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false
-  conditions = {Role = ["admin"]}
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
